@@ -1,6 +1,12 @@
 # BOOST_Bayesian_Optimization
 Bayesian Optimization framework and GUI implementation for BOOST: Bayesian Optimization with Optimal Kernel and Acquisition Function Selection Technique
 
+## 🚀 BOOST GUI Release
+The pre-release version (v0.1.0) of BOOST GUI is available for internal testing.
+
+- **Executable (.exe):** BOOST-GUI.exe  
+- **User Manual (PDF):** BOOST_GUI_Manual.pdf  
+
 Code Structure
 
 tests → Python scripts to evaluate the performance of BOOST and the 16 deterministic candidates
