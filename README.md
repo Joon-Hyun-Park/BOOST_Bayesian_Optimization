@@ -7,7 +7,7 @@ The pre-release version (v0.1.0) of BOOST GUI is available for internal testing.
 - **Executable (.exe):** BOOST-GUI.exe  
 - **User Manual (PDF):** BOOST_GUI_Manual.pdf  
 
-Code Structure
+## Code Structure
 
 tests → Python scripts to evaluate the performance of BOOST and the 16 deterministic candidates
 - Test_Benchmark_Functions.py → Runs tests on synthetic benchmark functions
