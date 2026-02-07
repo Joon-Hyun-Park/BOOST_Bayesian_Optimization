@@ -4,7 +4,7 @@ Implementation of **BOOST**, a novel Bayesian Optimization framework designed to
 
 ## Code Structure
 
-`tests` → Python scripts to evaluate the performance of BOOST and the 16 deterministic candidates
+### `tests` → Python scripts to evaluate the performance of BOOST and the 16 deterministic candidates
 - `Test_Benchmark_Functions.py` → Runs tests on synthetic benchmark functions
    - use_boost = True → Runs BOOST
    - use_boost = False → Uses fixed hyperparameter set
@@ -16,22 +16,22 @@ Implementation of **BOOST**, a novel Bayesian Optimization framework designed to
 - `_class_for_test_boost.py` → Defines the class to run the BO cycle (with or without BOOST).
    Used by Test_Benchmark_Functions.py and Test_HPOB.py
 
-`benchmarks` → Definitions of synthetic benchmark functions and datasets used in the experiments, including synthetic functions, processed HPO-B data, and chemical engineering datasets. All experiments directly use the processed CSV files provided in this repository.
+### `benchmarks` → Definitions of synthetic benchmark functions and datasets used in the experiments, including synthetic functions, processed HPO-B data, and chemical engineering datasets. All experiments directly use the processed CSV files provided in this repository.
 - `Benchmark_ftn.py` → Defines synthetic benchmark functions
 
-`core` → Core classes and functions for Bayesian Optimization
+### `core` → Core classes and functions for Bayesian Optimization
 - `BayesianOptimization.py` → Implements a single BO step
 - `BOOST.py` → Recommends a kernel–acquisition function pair using data-in-hand
 - `kernels_and_acquisitions.py` → Defines GP models and enumerates kernel/acquisition options
 
-`utils` → Utility functions
+### `utils` → Utility functions
 - `Save_results.py` → Saves results
 
 Note: Throughout the code and results, the Lower Confidence Bound (LCB) acquisition function is referred to as UCB for convenience, following common usage in BO libraries.
 
 ## Data Structure
 
-Note on Iteration Indexing
+### Note on Iteration Indexing
 - In the data files, iteration indexing starts at 0 and includes the initial samples.
 - In the main paper, iteration counts are reported excluding the initial samples.
 
@@ -39,13 +39,13 @@ Example:
 - Data file iteration 0–9  → Initial 10 samples
 - Data file iteration 10–99 → Iteration 0–89 in the main paper
 
-File Types
+### File Types
 1. Files ending with `_results.xlsx`
 - File name format: (objective)_(kernel_acq)_results.xlsx
 - For BOOST: "recommended" replaces kernel/acq name
 - Summarizes regret (mean and std) for each iteration
 
-Directory Structure
+### Directory Structure
 1. Synthetic Benchmark Functions
    - 1.1 BOOST
    - 1.2 16_Deterministic
@@ -57,14 +57,14 @@ Directory Structure
    - 3.2 16_Deterministic
 A. Additional Results → Data referenced in technical appendix (excluding ‘Default,’ which is included in the BOOST data).
 
-Notes
+### Notes
 - Throughout the code and results, the Lower Confidence Bound (LCB) acquisition function is referred to as UCB for convenience, following common usage in BO libraries.
 
 ## Dataset Citation
 
 When using the benchmark datasets, please cite the following works.
 
-HPO-B
+### HPO-B
 
 ```
 @article{arango2021hpo,
@@ -75,7 +75,7 @@ HPO-B
 }
 ```
 
-Chemical Engineering Datasets
+### Chemical Engineering Datasets
 
 ```
 @article{liang2021benchmarking,
