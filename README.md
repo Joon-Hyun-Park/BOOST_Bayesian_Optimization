@@ -16,7 +16,7 @@ tests → Python scripts to evaluate the performance of BOOST and the 16 determi
 - _class_for_test_boost.py → Defines the class to run the BO cycle (with or without BOOST).
    Used by Test_Benchmark_Functions.py and Test_HPOB.py
 
-benchmarks → Definitions of synthetic benchmark functions and datasets used in the experiments, including synthetic functions, processed HPO-B data, and chemical engineering datasets.
+benchmarks → Definitions of synthetic benchmark functions and datasets used in the experiments, including synthetic functions, processed HPO-B data, and chemical engineering datasets. All experiments directly use the processed CSV files provided in this repository.
 - Benchmark_ftn.py → Defines synthetic benchmark functions
 
 core → Core classes and functions for Bayesian Optimization
@@ -62,7 +62,7 @@ Notes
 
 ## Dataset Citation
 
-When using for Benchmark datasets, please cite the following authors for sharing their datasets.
+When using the benchmark datasets, please cite the following works.
 
 HPO-B
 
