@@ -117,14 +117,15 @@ year={2021},
 publisher={Wiley Online Library}
 }
 ```
-
 ## Graphical User Interface (Beta)
 
-We also provide a GUI version of BOOST for user convenience and visualization.
+To enhance accessibility, we provide a GUI version of BOOST for user convenience and visualization. This allows users to utilize the algorithm easily without complex code configurations.
 
-The source code is located in the BOOST_GUI/ folder.
+* **Source Code:** The source code for the GUI is located in the `BOOST_GUI/` folder.
+* **Standalone Executables:** If you do not have a Python environment, you can download the pre-compiled applications (`.exe` / `.app`) from the Releases page.
 
 Note: The experiments presented in the paper were conducted using the scripts in the experiments/ folder, not the GUI.
+
 
 ## License
 
