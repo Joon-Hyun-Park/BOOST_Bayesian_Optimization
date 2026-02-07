@@ -118,6 +118,14 @@ publisher={Wiley Online Library}
 }
 ```
 
+## Graphical User Interface (Beta)
+
+We also provide a GUI version of BOOST for user convenience and visualization.
+
+The source code is located in the BOOST_GUI/ folder.
+
+Note: The experiments presented in the paper were conducted using the scripts in the experiments/ folder, not the GUI.
+
 ## License
 
 [MIT license](https://opensource.org/license/mit/)
