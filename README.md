@@ -105,7 +105,7 @@ Chemical Engineering Datasets
 }
 ```
 
--P3HT/CNT dataset
+- P3HT/CNT dataset
 
 ```
 @article{bash2021multi,
