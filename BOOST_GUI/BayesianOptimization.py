@@ -46,12 +46,12 @@ class BayesianOptimizer:
             next_x_idx = self._get_next_idx(acquisition_type=acquisition_type, best_f=best_f, observed_pred=observed_pred, y_median=y_median, y_std=y_std)
             next_x = filtered_candidate_x[next_x_idx].unsqueeze(0)
 
-            # 수정된 코드:
+            # Modified code:
             prediction_mean = observed_pred.mean[next_x_idx].cpu().item()
-            prediction_var = observed_pred.variance[next_x_idx].cpu().item()  # 이름을 variance로 변경
+            prediction_var = observed_pred.variance[next_x_idx].cpu().item()  # Changed name to variance
 
             next_point_mean = prediction_mean * y_std + y_median
-            next_point_var = prediction_var * (y_std ** 2)  # ✅ 분산은 y_std의 제곱을 곱함
+            next_point_var = prediction_var * (y_std ** 2)  # ✅ Variance is multiplied by y_std squared
 
         # Remove unnecessary variables to free memory
         del candidate_x_normalized, observed_pred

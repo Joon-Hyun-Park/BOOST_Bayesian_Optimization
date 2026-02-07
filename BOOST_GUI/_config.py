@@ -4,7 +4,7 @@ import os
 from tkinter import filedialog, messagebox
 
 class ConfigManager:
-    """설정 저장/로드를 담당하는 클래스"""
+    """Class responsible for saving/loading configurations"""
 
     def __init__(self):
         pass
@@ -14,11 +14,11 @@ class ConfigManager:
         filename = filedialog.asksaveasfilename(
             title="Save Parameter Setup",
             defaultextension=".json",
-            filetypes=[("JSON files", "*.json"), ("All Files", "*")],  # ← "*" 로
-            initialdir=os.path.expanduser("~"),  # (선택) 사용자 홈에서 시작
+            filetypes=[("JSON files", "*.json"), ("All Files", "*")],  # use '*' for all files
+            initialdir=os.path.expanduser("~"),  # (optional) start in user's home directory
         )
         if not filename:
-            return False  # 사용자가 취소한 경우
+            return False  # user cancelled
 
         try:
             with open(filename, 'w', encoding="utf-8") as f:
@@ -34,9 +34,9 @@ class ConfigManager:
             title="Load Parameter Setup",
             filetypes=[
                 ("JSON files", "*.json"),
-                ("All Files", "*"),   # ← "*.*" 말고 "*" 사용
+                ("All Files", "*"),   # use '*' instead of '*.*'
             ],
-            initialdir=os.path.expanduser("~"),  # (선택)
+            initialdir=os.path.expanduser("~"),  # (optional)
         )
         if not filename:
             return None

@@ -9,7 +9,7 @@ MAX_DATA_ROWS = 20
 
 
 class DataTab:
-    """데이터 입력 탭을 담당하는 클래스"""
+    """Class responsible for the data input tab"""
 
     def __init__(self, parent_notebook, main_app):
         self.main_app = main_app
@@ -17,34 +17,34 @@ class DataTab:
         self.data_entries = []
         self.data_headers = []
 
-        # 탭 프레임 생성
+        # create tab frame
         self.frame = ttk.Frame(parent_notebook)
         parent_notebook.add(self.frame, text="Data Manager")
 
         self.setup_ui()
 
     def setup_ui(self):
-        # 행(row) 속성 설정
-        self.frame.rowconfigure(0, weight=1)  # 스크롤 테이블 (확장)
-        self.frame.rowconfigure(1, weight=0, minsize=40)  # 상단 정보
-        self.frame.rowconfigure(2, weight=0, minsize=50)  # 버튼들
+        # Configure row properties
+        self.frame.rowconfigure(0, weight=1)  # scrollable table (expand)
+        self.frame.rowconfigure(1, weight=0, minsize=40)  # top info
+        self.frame.rowconfigure(2, weight=0, minsize=50)  # buttons
 
         self.frame.columnconfigure(0, weight=1)
 
-        # 상단 정보
+        # top info
         self.setup_info_section()
-        # 스크롤 가능한 데이터 테이블
+        # scrollable data table
         self.setup_scrollable_table()
-        # 버튼들
+        # buttons
         self.setup_buttons()
-        # 초기 테이블 생성
+        # create initial table
         self.create_data_table()
 
     def setup_info_section(self):
         info_frame = tk.Frame(self.frame, bg=self.bg_color_2)
         info_frame.grid(row=1, column=0, sticky="ew", pady=5)
 
-        # 정보 프레임 열 설정
+        # configure info frame columns
         info_frame.columnconfigure(0, weight=1)
 
         self.data_info_label = tk.Label(info_frame, text="", bg=self.bg_color_2,
@@ -55,15 +55,15 @@ class DataTab:
         canvas_frame = tk.Frame(self.frame, bg=self.bg_color_2)
         canvas_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=5)
 
-        # ── grid 기초 레이아웃 ────────────────────────────────────────
-        # (0,0) canvas(확장), (0,1) vbar, (0,2) buttons
-        # (1,0) hbar(가로),  (1,1) 코너(옵션), (1,2) 버튼 아래 빈칸
+        # grid base layout
+        # (0,0) canvas (expand), (0,1) vbar, (0,2) buttons
+        # (1,0) hbar (horizontal), (1,1) corner (optional), (1,2) empty under buttons
         canvas_frame.rowconfigure(0, weight=1)
-        canvas_frame.rowconfigure(1, weight=0, minsize=16)  # hbar 높이(보일 때)
+        canvas_frame.rowconfigure(1, weight=0, minsize=16)  # hbar height (when visible)
         canvas_frame.columnconfigure(0, weight=1)
-        canvas_frame.columnconfigure(1, weight=0, minsize=16)  # vbar 폭(보일 때)
+        canvas_frame.columnconfigure(1, weight=0, minsize=16)  # vbar width (when visible)
 
-        # Canvas 생성
+        # Create Canvas
         self.data_canvas = tk.Canvas(
             canvas_frame,
             bg=self.bg_color_2,
@@ -73,7 +73,7 @@ class DataTab:
         hbar = ttk.Scrollbar(canvas_frame, orient="horizontal", command=self.data_canvas.xview)
         self.data_canvas.configure(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
 
-        # 배치
+        # layout
         self.data_canvas.grid(row=0, column=0, sticky="nsew")
         vbar.grid(row=0, column=1, sticky="ns")
         hbar.grid(row=1, column=0, sticky="ew")
@@ -81,10 +81,10 @@ class DataTab:
         self.scrollable_frame = ttk.Frame(self.data_canvas)
         self.data_canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-        # ── 토글 유틸: 보이기/숨기기 + minsize 조정 + hbar columnspan 관리 ──
+        # Toggle utilities: show/hide + minsize adjustments + manage hbar columnspan
         def _show_vbar(show: bool):
-            # 보일 때: vbar grid, column1 minsize=16
-            # 숨김  때: vbar grid_remove, column1 minsize=0
+            # When showing: vbar grid, column1 minsize=16
+            # When hiding: vbar grid_remove, column1 minsize=0
             canvas_frame.columnconfigure(1, minsize=16)
             if show:
                 vbar.grid()
@@ -92,15 +92,15 @@ class DataTab:
                 vbar.grid_remove()
 
         def _show_hbar(show: bool):
-            # 보일 때: row1 minsize=16, hbar grid
-            # 숨김  때: row1 minsize=0,  hbar grid_remove
+            # When showing: row1 minsize=16, hbar grid
+            # When hiding: row1 minsize=0, hbar grid_remove
             canvas_frame.rowconfigure(1, minsize=16)
             if show:
                 hbar.grid()
             else:
                 hbar.grid_remove()
 
-        # ── 스크롤 영역/토글 갱신 ──
+        # Update scrollbars and toggles
         def update_scrollbars():
             region = self.data_canvas.bbox("all")  # (x1,y1,x2,y2) or None
             if not region:
@@ -119,15 +119,15 @@ class DataTab:
             _show_hbar(need_h)
             _show_vbar(need_v)
 
-            # 항상 최신 scrollregion 유지
+            # Keep scrollregion up to date
             self.data_canvas.configure(scrollregion=region)
 
-        # 내용이 변할 때도 갱신해야 함 (scrollable_frame에 바인딩)
+        # update when content changes (bind to scrollable_frame)
         self.scrollable_frame.bind("<Configure>", lambda e: update_scrollbars())
-        # 창/캔버스 크기 변할 때도 갱신
+        # update on window/canvas resize
         self.data_canvas.bind("<Configure>", lambda e: update_scrollbars())
 
-        # 마우스 휠 스크롤 이벤트 바인딩 추가
+        # add mouse wheel scroll bindings
         def _on_mousewheel(event):
             region = self.data_canvas.bbox("all")
             if region and region[3] > self.data_canvas.winfo_height():
@@ -140,17 +140,17 @@ class DataTab:
         self.data_canvas.bind("<Leave>", lambda e: self.data_canvas.unbind_all("<MouseWheel>"))
         self.data_canvas.bind_all("<Shift-MouseWheel>", _on_shift_mousewheel)
 
-        # 처음에도 한 번 계산
+        # initial calculation
         canvas_frame.after(0, update_scrollbars)
 
     def setup_buttons(self):
         data_button_frame = tk.Frame(self.frame, bg=self.bg_color_2)
-        data_button_frame.grid(row=2, column=0, sticky="", pady=10)  # sticky="" = 가운데 정렬
+        data_button_frame.grid(row=2, column=0, sticky="", pady=10)  # sticky="" = center alignment
 
-        # 버튼들을 grid로 배치
+        # place buttons using grid
         btn_col = 0
 
-        # Row 관련 버튼들
+        # Row-related buttons
         add_btn = tk.Button(data_button_frame, text="   Add Row   ", command=self.add_data_row,
                             font=self.main_app.button_font)
         add_btn.grid(row=0, column=btn_col, padx=7, pady=2)
@@ -161,12 +161,12 @@ class DataTab:
         remove_btn.grid(row=0, column=btn_col, padx=7, pady=2)
         btn_col += 1
 
-        # 구분선
+        # separator
         separator = tk.Frame(data_button_frame, width=2, height=20, bg='gray')
         separator.grid(row=0, column=btn_col, padx=10, pady=2)
         btn_col += 1
 
-        # File 관련 버튼들
+        # File-related buttons
         save_btn = tk.Button(data_button_frame, text="  Save File  ", command=self.save_file,
                             font=self.main_app.button_font)
         save_btn.grid(row=0, column=btn_col, padx=7, pady=2)
@@ -177,12 +177,12 @@ class DataTab:
         load_btn.grid(row=0, column=btn_col, padx=7, pady=2)
         btn_col += 1
 
-        # 구분선
+        # separator
         separator2 = tk.Frame(data_button_frame, width=2, height=20, bg='gray')
         separator2.grid(row=0, column=btn_col, padx=10, pady=2)
         btn_col += 1
 
-        # Reset 버튼
+        # Reset button
         reset_btn = tk.Button(data_button_frame, text="    Reset    ", command=self.clear_data,
                               font=self.main_app.button_font)
         reset_btn.grid(row=0, column=btn_col, padx=7, pady=2)
@@ -190,13 +190,13 @@ class DataTab:
     def create_data_table(self):
         global MAX_DATA_ROWS
 
-        # 기존 테이블 제거
+        # Remove existing table
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
 
         num_vars = self.main_app.var_count_var.get()
 
-        # 파라미터 이름을 가져와서 헤더로 사용
+        # Get parameter names to use as headers
         headers = []
         for i in range(num_vars):
             if (hasattr(self.main_app, 'param_tab') and
@@ -214,7 +214,7 @@ class DataTab:
             else:
                 headers.append(f"x{i + 1}")
 
-        # Y 컬럼 이름 추가
+        # Add Y column name
         if hasattr(self.main_app, 'param_tab'):
             y_name = self.main_app.param_tab.get_y_name().strip()
             y_unit = self.main_app.param_tab.get_y_unit().strip()
@@ -228,17 +228,17 @@ class DataTab:
             else:
                 headers.append(y_name)
         else:
-            headers.append("Y")  # 이름까지 비어 있으면 기본값)
+            headers.append("Y")  # Default if name is also empty)
 
-        # 각 컬럼의 너비 계산
+        # Compute widths for each column
         entry_widths = [self.calculate_entry_width(header) for header in headers]
 
-        # "Data" 헤더 라벨 (첫 번째 컬럼)
+        # "Data" header label (first column)
         data_header_label = tk.Label(self.scrollable_frame, text=" ",
                                      font=self.main_app.label_font, bg=self.bg_color_2)
         data_header_label.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
 
-        # 파라미터 헤더 레이블들을 저장
+        # Store parameter header labels
         self.data_headers = []
         for j, header in enumerate(headers):
             label = tk.Label(self.scrollable_frame, text=header,
@@ -246,17 +246,17 @@ class DataTab:
             label.grid(row=0, column=j + 1, padx=5, pady=5, sticky="ew")
             self.data_headers.append(label)
 
-        # 데이터 행들 생성
+        # Create data rows
         self.data_entries = []
         for i in range(MAX_DATA_ROWS):
             row_entries = []
 
-            # 왼쪽에 Data 번호 라벨 추가
+            # Add Data number label at left
             data_label = tk.Label(self.scrollable_frame, text=f"Data {i + 1}",
                                   font=self.main_app.label_font, bg=self.bg_color_2)
             data_label.grid(row=i + 1, column=0, padx=2, pady=1)
 
-            # 각 파라미터와 Y값에 대한 Entry 생성
+            # Create Entry widgets for each parameter and Y value
             for j in range(num_vars + 1):
                 entry = tk.Entry(self.scrollable_frame, width=entry_widths[j],
                                  font=self.main_app.button_font, justify="center")
@@ -266,19 +266,19 @@ class DataTab:
             self.data_entries.append(row_entries)
 
     def calculate_entry_width(self, text):
-        """텍스트 길이에 따라 Entry 위젯의 적절한 너비를 계산"""
+        """Calculate an appropriate Entry widget width based on text length"""
         min_width = 8
         max_width = 20
         return max(min_width, min(max_width, len(text) + 3))
 
     def update_data_headers(self):
-        """데이터 탭의 헤더만 업데이트"""
+        """Update only the headers in the data tab"""
         if not hasattr(self.main_app, 'param_tab'):
             return
 
         num_vars = self.main_app.var_count_var.get()
 
-        # 새로운 헤더 이름들 가져오기 (단위 포함)
+        # Get new header names (including units)
         new_headers = []
         for i in range(num_vars):
             if (i < len(self.main_app.param_tab.param_entries) and
@@ -296,7 +296,7 @@ class DataTab:
             else:
                 new_headers.append(f"x{i + 1}")
 
-        # Y 컬럼 이름 추가 (단위 포함)
+        # Add Y column name (including unit)
         y_name = self.main_app.param_tab.get_y_name()
         y_unit = self.main_app.param_tab.get_y_unit()
         if y_name:
@@ -315,7 +315,7 @@ class DataTab:
 
         num_vars = self.main_app.var_count_var.get()
 
-        # 파라미터 이름을 가져와서 표시 (단위 포함)
+        # Get and display parameter names (including units)
         var_names = []
         for i in range(num_vars):
             if (i < len(self.main_app.param_tab.param_entries) and
@@ -348,36 +348,37 @@ class DataTab:
         )
 
     def add_data_row(self):
-        """사용자가 수동으로 행을 추가할 때"""
+        """Called when the user manually adds a row"""
         self.add_single_row()
 
     def remove_data_row(self):
         global MAX_DATA_ROWS
         if MAX_DATA_ROWS > 1 and len(self.data_entries) > 0:
-            # 마지막 행의 위젯들 제거
+            # remove widgets of the last row
             last_row_idx = len(self.data_entries) - 1
 
-            # 마지막 행의 모든 위젯 찾아서 삭제
+            # destroy all widgets in the last row
             for widget in self.scrollable_frame.grid_slaves(row=last_row_idx + 1):
                 widget.destroy()
 
-            # data_entries에서 마지막 행 제거
+            # remove last row from data_entries
             self.data_entries.pop()
+
 
             MAX_DATA_ROWS -= 1
 
-            # 스크롤 영역 업데이트
+            # update scroll region
             self.data_canvas.configure(scrollregion=self.data_canvas.bbox("all"))
 
     def clear_data(self, with_warning=True):
         if with_warning:
-            # 확인 문구 표시
+            # show confirmation dialog
             result = messagebox.askyesno(
                 "Reset Confirmation",
                 "Are you sure you want to reset all data?\n\nThis will:\n• Reset all data\n\nThis action cannot be undone."
             )
 
-            if not result:  # 사용자가 'No' 또는 창을 닫은 경우
+            if not result:  # user chose 'No' or closed dialog
                 return
 
         for row in self.data_entries:
@@ -401,34 +402,34 @@ class DataTab:
             if not filename:
                 return
 
-            # 파일 확장자에 따라 다른 방식으로 읽기
+            # Read file according to its extension
             file_ext = filename.lower().split('.')[-1]
 
             if file_ext in ['xlsx', 'xls']:
-                # Excel 파일 읽기
+                # Read Excel file
                 try:
-                    # 첫 번째 시트 읽기
+                    # read the first sheet
                     df = pd.read_excel(filename, sheet_name=0)
                 except Exception as e:
-                    # 여러 시트가 있는 경우 사용자에게 선택하도록 할 수도 있음
+                    # could prompt the user to choose if multiple sheets exist
                     messagebox.showerror("Excel Read Error", f"An error occurred while reading the Excel file:\n{str(e)}")
                     return
 
 
             elif file_ext in ['csv', 'txt', 'tsv']:
-                # CSV / TXT / TSV : 인코딩 자동 시도 + 구분자 자동 감지
+                # CSV / TXT / TSV: try multiple encodings + auto-detect delimiter
                 encodings_to_try = ['utf-8', 'euc-kr', 'cp949', 'latin1']
                 df = None
                 for enc in encodings_to_try:
                     try:
-                        # sep=None + engine='python' → 쉼표/탭/세미콜론 등 자동 감지
+                        # sep=None + engine='python' -> auto-detect delimiter (comma/tab/semicolon, etc.)
                         df = pd.read_csv(filename, sep=None, engine='python', encoding=enc)
-                        # print(f"Loaded with encoding: {enc}")  # 필요시 로그
+                        # print(f"Loaded with encoding: {enc}")  # optional log
                         break
                     except (UnicodeDecodeError, AttributeError, ValueError):
                         continue
                     except Exception:
-                        # 구분자 자동 감지가 애매한 경우를 대비해 공백 구분 시도
+                        # if auto-detect fails, try whitespace delimiter as a fallback
                         try:
                             df = pd.read_csv(filename, delim_whitespace=True, encoding=enc)
                             break
@@ -447,17 +448,17 @@ class DataTab:
                                      f"The file type '{file_ext}' is not supported.")
                 return
 
-            # 데이터가 비어있는지 확인
+            # Check whether the dataframe is empty
             if df.empty:
                 messagebox.showwarning("Empty File", "The file contains no data.")
                 return
 
-            new_headers = list(df.columns)  # 파일 컬럼 헤더들
-            file_var_count = max(0, len(new_headers) - 1)  # Y 제외 X 개수
+            new_headers = list(df.columns)  # file column headers
+            file_var_count = max(0, len(new_headers) - 1)  # number of X (excluding Y)
             num_vars = self.main_app.var_count_var.get()
 
             # ─────────────────────────────────────────────────────────
-            # 1) (가장 먼저) 변수 개수 불일치 처리 → 구조부터 확정
+            # 1) (First) Handle variable count mismatch -> Fix structure
             # ─────────────────────────────────────────────────────────
             num_vars = self.main_app.var_count_var.get()
             if file_var_count != num_vars:
@@ -467,28 +468,28 @@ class DataTab:
                         f"Do you want to adjust the variable count to {file_var_count}?"
                 ):
                     self.main_app.var_count_var.set(file_var_count)
-                    # 변수 개수가 바뀌었으므로 모든 테이블 구조를 새로고침
+                    # Variable count changed, refresh all table structures
                     self.main_app.param_tab.create_param_table()
                     self.preserve_and_rebuild_table()
                     self.update_data_info()
 
-            # 최신 변수 개수를 다시 가져옴
+            # fetch the updated variable count
             current_num_vars = self.main_app.var_count_var.get()
 
             # ─────────────────────────────────────────────────────────
-            # 2) (구조 확정 후) 헤더 교체 여부 처리 → 내용 채우기
+            # 2) (After structure fix) Handle header replacement -> Fill content
             # ─────────────────────────────────────────────────────────
             if messagebox.askyesno(
                     "Header Detected",
                     "A header row has been detected.\nDo you want to replace the existing parameter names with this header?"
             ):
-                # Y 이름/단위 (항상 마지막 열)
+                # Y name/unit (always last column)
                 if len(new_headers) > 0:
                     y_full = new_headers[-1]
                     y_match = re.match(r"(.*?)\s*\((.*?)\)", y_full)
                     if y_match:
                         y_name, y_unit = y_match.group(1).strip(), y_match.group(2).strip()
-                    # ... (기존 Y 이름 파싱 로직과 동일) ...
+                    # ... (existing Y name parsing logic remains) ...
                     else:
                         y_name, y_unit = y_full.strip(), ""
                     self.main_app.param_tab.y_name_entry.delete(0, tk.END)
@@ -496,13 +497,13 @@ class DataTab:
                     self.main_app.param_tab.y_unit_entry.delete(0, tk.END)
                     self.main_app.param_tab.y_unit_entry.insert(0, y_unit)
 
-                # X 이름/단위 (현재 변수 개수만큼 정확히 반영)
+                # X name/unit (apply exactly for current variable count)
                 for i in range(min(current_num_vars, len(new_headers) - 1)):
                     header = new_headers[i]
                     m = re.match(r"(.*?)\s*\((.*?)\)", header)
                     if m:
                         name, unit = m.group(1).strip(), m.group(2).strip()
-                    # ... (기존 X 이름 파싱 로직과 동일) ...
+                    # ... (Same as existing X name parsing logic) ...
                     else:
                         name, unit = header.strip(), ""
                     if i < len(self.main_app.param_tab.param_entries):
@@ -511,30 +512,28 @@ class DataTab:
                         self.main_app.param_tab.param_entries[i][1].delete(0, tk.END)
                         self.main_app.param_tab.param_entries[i][1].insert(0, unit)
 
-                # 헤더를 바꿨으니 표시 갱신
+                # header changed; update display
                 self.update_data_headers()
                 self.update_data_info()
 
-            # ─────────────────────────────────────────────────────────
-            # 3) (공통) 행 개수 확보 + 기존 데이터 클리어 + 데이터 삽입
-            # ─────────────────────────────────────────────────────────
+            # 3) Ensure enough rows + clear existing data + insert new data
             required_rows = len(df)
             while len(self.data_entries) < required_rows:
                 self.add_single_row()
 
             self.clear_data(with_warning=False)
 
-            # 데이터 삽입 (최신 변수 개수 기준)
+            # Insert data (based on latest variable count)
             for i, row in df.iterrows():
                 if i < len(self.data_entries):
-                    # X 값 입력 (앞쪽 current_num_vars 개)
+                    # Insert X values (first current_num_vars columns)
                     for j in range(min(current_num_vars, len(row) - 1)):
                         value = row.iloc[j]
                         self.data_entries[i][j].insert(0, "" if pd.isna(value) else str(value))
 
-                    # Y 값 입력 (항상 마지막 컬럼)
+                    # Insert Y value (always last column)
                     y_value = row.iloc[-1]
-                    # Y값이 들어갈 Entry의 인덱스는 current_num_vars
+                    # Index for Y value Entry is current_num_vars
                     if current_num_vars < len(self.data_entries[i]):
                         self.data_entries[i][current_num_vars].insert(
                             0, "" if pd.isna(y_value) else str(y_value)
@@ -568,7 +567,7 @@ class DataTab:
             if not filename:
                 return
 
-            # 🔁 안전한 기호로 정규화 (℃→°C, ℉→°F 등)
+            # 🔁 Normalize to safe symbols (℃→°C, ℉→°F, etc.)
             df_to_save = data.copy()
             try:
                 for col in df_to_save.columns:
@@ -578,17 +577,17 @@ class DataTab:
                         s = s.str.replace("\u2109", "°F", regex=False)  # ℉ → °F
                         df_to_save[col] = s
             except Exception:
-                pass  # 문자열 변환 중 문제 있으면 그냥 무시하고 진행
+                pass  # Ignore if issues occur during string conversion
 
             file_ext = filename.lower().split('.')[-1]
 
             if file_ext in ('xlsx', 'xls'):
-                # Excel은 유니코드 안전함 (openpyxl가 처리)
+                # Excel is unicode safe (handled by openpyxl)
                 try:
                     with pd.ExcelWriter(filename, engine='openpyxl') as writer:
                         df_to_save.to_excel(writer, sheet_name='Data', index=False)
 
-                        # (선택) 헤더 스타일 + 자동열폭
+                        # (Optional) Header style + Auto column width
                         try:
                             workbook = writer.book
                             worksheet = writer.sheets['Data']
@@ -620,7 +619,7 @@ class DataTab:
                     return
 
             elif file_ext in ('tsv', 'txt'):
-                # ✅ UTF-8 with BOM로 저장 → 엑셀/메모장 호환 좋음
+                # ✅ Save as UTF-8 with BOM -> Good compatibility with Excel/Notepad
                 df_to_save.to_csv(filename, sep='\t', index=False, encoding='utf-8-sig')
 
             elif file_ext == 'csv':
@@ -628,7 +627,7 @@ class DataTab:
                 df_to_save.to_csv(filename, index=False, encoding='utf-8-sig')
 
             else:
-                # 확장자 모호하면 CSV로 저장 (UTF-8 BOM)
+                # If extension is ambiguous, save as CSV (UTF-8 BOM)
                 if not filename.lower().endswith('.csv'):
                     filename = filename + ".csv"
                 df_to_save.to_csv(filename, index=False, encoding='utf-8-sig')
@@ -639,14 +638,14 @@ class DataTab:
             messagebox.showerror("Save Error", f"An error occurred while saving the file:\n{str(e)}")
 
     def extract_data_only(self):
-        """데이터만 추출"""
+        """Extract data only"""
         try:
             if not hasattr(self.main_app, 'param_tab'):
                 return pd.DataFrame()
 
             num_vars = self.main_app.var_count_var.get()
 
-            # 파라미터 이름을 가져와서 사용 (단위 포함)
+            # Get and use parameter names (including units)
             var_names = []
             for i in range(num_vars):
                 if (i < len(self.main_app.param_tab.param_entries) and
@@ -669,14 +668,14 @@ class DataTab:
                 row = []
                 for j in range(num_vars + 1):
                     val = row_entries[j].get().strip()
-                    if val:  # 값이 비어있지 않으면
+                    if val:  # If value is not empty
                         try:
                             row.append(float(val))
                         except ValueError:
-                            # 숫자로 변환할 수 없는 값이면 NaN 처리
+                            # Treat as NaN if value cannot be converted to number
                             row.append(np.nan)
-                    else:  # 값이 비어있으면
-                        row.append(np.nan)  # NaN(Not a Number)으로 추가
+                    else:  # If value is empty
+                        row.append(np.nan)  # Add as NaN (Not a Number)
 
                 if len(row) == num_vars + 1:
                     rows.append(row)
@@ -684,7 +683,7 @@ class DataTab:
                     break
 
             if rows:
-                # Y 컬럼 이름도 단위 포함
+                # Y column name also includes unit
                 y_name = self.main_app.param_tab.get_y_name()
                 y_unit = self.main_app.param_tab.get_y_unit()
 
@@ -702,12 +701,12 @@ class DataTab:
         except Exception:
             return pd.DataFrame()
 
-    # _data_tab.py에 추가
+    # Added to _data_tab.py
     def add_suggested_points(self, points, param_info):
-        """추천된 포인트들을 데이터 테이블 맨 뒤에 추가"""
+        """Add recommended points to the end of the data table"""
         global MAX_DATA_ROWS
 
-        # 현재 데이터가 있는 마지막 행 찾기
+        # Find the last row with data
         last_row_with_data = -1
         for i, row_entries in enumerate(self.data_entries):
             has_data = any(entry.get().strip() for entry in row_entries)
@@ -717,29 +716,29 @@ class DataTab:
         start_row = last_row_with_data + 1
         needed_rows = start_row + len(points)
 
-        # 필요한 만큼 행 자동 추가
+        # Automatically add rows as needed
         while len(self.data_entries) < needed_rows:
-            self.add_single_row()  # 새로운 헬퍼 함수
+            self.add_single_row()
 
-        # 포인트들 추가
+        # Add points
         for i, point in enumerate(points):
             row_idx = start_row + i
             if row_idx < len(self.data_entries):
                 for j, value in enumerate(point):
                     if j < len(self.data_entries[row_idx]):
-                        # 기존 값이 있으면 지우고 새 값 입력
+                        # If existing value exists, clear and insert new value
                         self.data_entries[row_idx][j].delete(0, tk.END)
                         self.data_entries[row_idx][j].insert(0, str(value))
 
         messagebox.showinfo("Points Added", f"{len(points)} recommended points have been added to the data table.")
 
     def add_single_row(self):
-        """단일 행을 동적으로 추가하는 헬퍼 함수"""
+        """Helper function to dynamically add a single row"""
         global MAX_DATA_ROWS
 
         num_vars = self.main_app.var_count_var.get()
 
-        # 헤더 정보 가져오기
+        # Get header info
         headers = []
         for i in range(num_vars):
             if (hasattr(self.main_app, 'param_tab') and
@@ -757,7 +756,7 @@ class DataTab:
             else:
                 headers.append(f"x{i + 1}")
 
-        # Y 컬럼 이름 추가
+        # Add Y column name
         if hasattr(self.main_app, 'param_tab'):
             y_name = self.main_app.param_tab.get_y_name().strip()
             y_unit = self.main_app.param_tab.get_y_unit().strip()
@@ -771,16 +770,16 @@ class DataTab:
 
         entry_widths = [self.calculate_entry_width(header) for header in headers]
 
-        # 새 행 추가
+        # Add new row
         new_row_idx = len(self.data_entries)
         row_entries = []
 
-        # 행 번호 라벨
+        # Row number label
         data_label = tk.Label(self.scrollable_frame, text=f"Data {new_row_idx + 1}",
                               font=self.main_app.label_font, bg=self.bg_color_2)
         data_label.grid(row=new_row_idx + 1, column=0, padx=2, pady=1)
 
-        # Entry 위젯들 추가
+        # Add Entry widgets
         for j in range(num_vars + 1):
             entry = tk.Entry(self.scrollable_frame, width=entry_widths[j],
                              font=self.main_app.button_font, justify="center")
@@ -790,65 +789,65 @@ class DataTab:
         self.data_entries.append(row_entries)
         MAX_DATA_ROWS += 1
 
-        # 스크롤 영역 업데이트
+        # Update scroll region
         self.scrollable_frame.update_idletasks()
         self.data_canvas.configure(scrollregion=self.data_canvas.bbox("all"))
 
-    # _data_tab.py에 추가할 함수들
+    # Functions to add to _data_tab.py
 
     def remove_last_parameter_column(self):
-        """마지막 파라미터 컬럼만 제거 (Y 컬럼은 유지)"""
-        # 현재 데이터 백업
+        """Remove only the last parameter column (Keep Y column)"""
+        # Backup current data
         current_data = []
         for row_entries in self.data_entries:
             row_data = []
-            # Y값 앞까지의 파라미터들 (마지막 파라미터 제외)
-            for j in range(len(row_entries) - 2):  # 마지막에서 2번째까지 (제거할 파라미터 제외)
+            # Parameters before Y value (excluding last parameter)
+            for j in range(len(row_entries) - 2):  # Up to second to last (excluding parameter to remove)
                 row_data.append(row_entries[j].get())
-            # Y 컬럼 값 추가 (항상 마지막)
+            # Add Y column value (always last)
             if len(row_entries) > 0:
-                row_data.append(row_entries[-1].get())  # Y 컬럼
+                row_data.append(row_entries[-1].get())
             current_data.append(row_data)
 
-        # 테이블 재생성
+        # Rebuild table
         self.create_data_table()
 
-        # 데이터 복원
+        # Restore data
         num_vars = self.main_app.var_count_var.get()
         for i, row_data in enumerate(current_data):
             if i < len(self.data_entries):
-                # 파라미터들 복원
-                for j in range(len(row_data) - 1):  # Y값 제외한 파라미터들
+                # Restore parameters
+                for j in range(len(row_data) - 1):  # Parameters excluding Y value
                     if j < len(self.data_entries[i]):
                         self.data_entries[i][j].insert(0, row_data[j])
-                # Y 값 복원 (항상 마지막 컬럼)
+                # Restore Y value (always last column)
                 if len(row_data) > 0 and len(self.data_entries[i]) > num_vars:
                     self.data_entries[i][num_vars].insert(0, row_data[-1])
 
     def preserve_and_rebuild_table(self):
-        """기존 데이터를 보존하면서 테이블을 재생성 (파라미터 추가 시 Y값 앞에 빈 컬럼 삽입)"""
-        # 현재 데이터 백업
+        """Rebuild table while preserving existing data (Insert empty column before Y value when adding parameter)"""
+        # Backup current data
         current_data = []
         for row_entries in self.data_entries:
             row_data = [entry.get() for entry in row_entries]
             current_data.append(row_data)
 
-        # 테이블 재생성
+        # Rebuild table
         self.create_data_table()
 
-        # 데이터 복원
-        old_num_vars = len(current_data[0]) - 1 if current_data and current_data[0] else 0  # Y 제외한 이전 파라미터 개수
+        # Restore data
+        old_num_vars = len(current_data[0]) - 1 if current_data and current_data[0] else 0  # Number of previous parameters excluding Y
         new_num_vars = self.main_app.var_count_var.get()
 
         for i, row_data in enumerate(current_data):
             if i < len(self.data_entries) and row_data:
-                # 기존 파라미터들 복원
+                # Restore existing parameters
                 for j in range(min(old_num_vars, new_num_vars)):
                     if j < len(self.data_entries[i]):
                         self.data_entries[i][j].insert(0, row_data[j])
 
-                # Y값 복원 (항상 마지막 컬럼)
+                # Restore Y value (always last column)
                 if len(row_data) > old_num_vars and new_num_vars < len(self.data_entries[i]):
                     self.data_entries[i][new_num_vars].insert(0, row_data[-1])
 
-                # 새로 추가된 파라미터 컬럼들은 자동으로 빈칸으로 남음
+                # Newly added parameter columns remain empty automatically

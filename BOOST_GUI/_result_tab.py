@@ -13,37 +13,37 @@ from BayesianOptimization import BayesianOptimizer
 
 
 class ResultTab(BayesianOptimizer):
-    """실행 및 결과 탭 (grid 레이아웃, 중앙 폰트 제어, 버튼 하단 배치)"""
+    """Run and Results tab (grid layout, central font control, buttons at bottom)"""
 
     def __init__(self, parent_notebook, main_app):
         super().__init__()
         self.main_app = main_app
         self.bg_color_2 = main_app.bg_color_2
-        self.last_suggested_points = None  # 마지막 추천 포인트 저장
-        self.last_param_info = None        # 마지막 파라미터 정보 저장
+        self.last_suggested_points = None  # store last suggested points
+        self.last_param_info = None        # store last parameter info
 
-        # 탭 프레임 생성 (영문 제목)
+        # create tab frame (English title)
         self.frame = ttk.Frame(parent_notebook)
         parent_notebook.add(self.frame, text="Run & Results")
 
         self.setup_ui()
 
     def setup_ui(self):
-        # ----- grid 베이스 레이아웃 -----
-        # row 0: 결과 텍스트 영역(스크롤)  [확장]
-        # row 1: 제안 라벨                [내용 크기만]
-        # row 2: 버튼 바(실행/추가)        [고정, 하단]
-        self.frame.rowconfigure(0, weight=1)   # 텍스트 영역 확장
+        # ----- grid base layout -----
+        # row 0: result text area (scrollable)  [expand]
+        # row 1: suggestion label                [size to content]
+        # row 2: button bar (run/add)            [fixed, bottom]
+        self.frame.rowconfigure(0, weight=1)   # expand text area
         self.frame.rowconfigure(1, weight=0)
         self.frame.rowconfigure(2, weight=0, minsize=60)
         self.frame.columnconfigure(0, weight=1)
 
-        # ----- 결과 표시 영역 (Text + Scrollbar) -----
+        # ----- Result Display Area (Text + Scrollbar) -----
         result_display_frame = tk.Frame(self.frame, bg=self.bg_color_2)
         result_display_frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=(15, 5))
 
-        result_display_frame.rowconfigure(0, weight=0)  # "Current Data:" 라벨
-        result_display_frame.rowconfigure(1, weight=1)  # Text 확장
+        result_display_frame.rowconfigure(0, weight=0)  # "Current Data:" label
+        result_display_frame.rowconfigure(1, weight=1)  # Text expands
         result_display_frame.columnconfigure(0, weight=1)
         result_display_frame.columnconfigure(1, weight=0)
 
@@ -68,7 +68,7 @@ class ResultTab(BayesianOptimizer):
         self.result_text.grid(row=1, column=0, sticky="nsew")
         result_scrollbar.grid(row=1, column=1, sticky="ns")
 
-        # ----- 제안 라벨 -----
+        # ----- suggestion label -----
         self.suggestion_label = tk.Label(
             self.frame,
             text="",
@@ -77,11 +77,11 @@ class ResultTab(BayesianOptimizer):
         )
         self.suggestion_label.grid(row=1, column=0, sticky="", padx=20, pady=(5, 5))
 
-        # ----- 버튼 바 (하단) -----
+        # ----- button bar (bottom) -----
         button_frame = tk.Frame(self.frame, bg=self.bg_color_2)
         button_frame.grid(row=2, column=0, sticky="", pady=(5, 15))
 
-        # 실행 버튼
+        # Run button
         run_btn = tk.Button(
             button_frame,
             text="Suggest Next Points",
@@ -92,11 +92,11 @@ class ResultTab(BayesianOptimizer):
         )
         run_btn.grid(row=0, column=0, padx=7, pady=2)
 
-        # 구분선
+        # separator
         sep = tk.Frame(button_frame, width=2, height=20, bg='gray')
         sep.grid(row=0, column=1, padx=10, pady=2)
 
-        # 추천 포인트 추가 버튼 (초기 비활성화)
+        # Add recommended points button (initially disabled)
         self.add_points_button = tk.Button(
             button_frame,
             text="Add Recommended Points",
@@ -111,7 +111,7 @@ class ResultTab(BayesianOptimizer):
 
     def run_optimization(self):
         try:
-            # 데이터 추출
+            # extract data
             df = self.main_app.data_tab.extract_data_only()
             partially_filled = df[df.notna().any(axis=1) & df.isna().any(axis=1)]
             if len(partially_filled) > 0:
@@ -128,11 +128,11 @@ class ResultTab(BayesianOptimizer):
             df = df.dropna()
 
             if df.empty or len(df) < 6:
-                # 데이터가 부족할 때: LHS 샘플링
+                # If insufficient data: use LHS sampling
                 param_config = self.main_app.param_tab.get_param_config()
                 param_info = param_config["parameters"]
 
-                # 결과 표시
+                # display results
                 self.result_text.delete(1.0, tk.END)
                 self.result_text.insert(tk.END, "Parameter Settings:\n")
                 for param in param_info:
@@ -152,14 +152,14 @@ class ResultTab(BayesianOptimizer):
                     self.result_text.insert(tk.END, "\n\nData is insufficient. Running LHS sampling.\n")
                     n_samples = 10 - len(df)
 
-                # LHS 샘플링 실행
+                # Run LHS sampling
                 dim = len(param_info)
                 next_points = self._generate_lhs_samples(dim, n_samples, param_info=param_info)
 
-                # 추천 포인트와 파라미터 정보 저장
+                # store recommended points and parameter info
                 self.last_suggested_points = next_points
                 self.last_param_info = param_info
-                self.add_points_button.config(state="normal")  # 버튼 활성화
+                self.add_points_button.config(state="normal")  # enable button
 
                 suggestion_text = (
                     f"LHS recommended points ({len(next_points)}):\n" +
@@ -172,12 +172,12 @@ class ResultTab(BayesianOptimizer):
                 self.suggestion_label.config(text=suggestion_text)
                 return
 
-            # Parameter 정보 추출
+            # Extract parameter info
             param_config = self.main_app.param_tab.get_param_config()
             param_info = param_config["parameters"]
             is_maximization = param_config.get("objective", "maximize") == "maximize"
 
-            # 결과 표시
+            # display results
             self.result_text.delete(1.0, tk.END)
             self.result_text.insert(tk.END, "Parameter Settings:\n")
             for param in param_info:
@@ -190,7 +190,7 @@ class ResultTab(BayesianOptimizer):
             self.result_text.insert(tk.END, f"\nCurrent Data ({len(df)} rows):\n")
             self.result_text.insert(tk.END, df.to_string(index=False))
 
-            # GUI 데이터에서 X, Y 추출
+            # extract X, Y from GUI data
             train_x_list, train_y_list = [], []
             for _, row in df.iterrows():
                 x_values = [row.iloc[i] for i in range(len(param_info))]
@@ -198,19 +198,19 @@ class ResultTab(BayesianOptimizer):
                 y_value = row.iloc[-1]
                 train_y_list.append(y_value)
 
-            # torch tensor로 변환
+            # convert to torch tensors
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             train_x = torch.tensor(train_x_list, dtype=torch.double, device=device)
             train_y = torch.tensor(train_y_list, dtype=torch.double, device=device)
 
-            # 최대화 문제면 부호 변경 (내부 최소화 형태로)
+            # if maximization, invert sign (internal minimization)
             if is_maximization:
                 train_y = -train_y
                 self.result_text.insert(tk.END, f"\n\nObjective: maximize {param_config['y_name']}\n")
             else:
                 self.result_text.insert(tk.END, f"\n\nObjective: minimize {param_config['y_name']}\n")
 
-            # candidate points 생성 (grid)
+            # generate candidate points (grid)
             candidate_points = []
             for d, param in enumerate(param_info):
                 grid = []
@@ -221,19 +221,19 @@ class ResultTab(BayesianOptimizer):
                 candidate_points.append(torch.tensor(grid, dtype=torch.double, device=device))
 
 
-            # ── 💡 후보점 개수 및 메모리 사용량 체크 ─────────────────────────────
+            # Check number of candidate points and memory usage
             num_candidates = 1
             for grid in candidate_points:
                 num_candidates *= len(grid)
 
             dim = len(candidate_points)
-            expected_mem = num_candidates * dim * 8  # GB 단위 (float64 기준)
+            expected_mem = num_candidates * dim * 8  # GB unit (based on float64)
             mem = psutil.virtual_memory()
 
             print(expected_mem/ (1024**3))
             print(mem.total/ (1024**3))
 
-            used_ratio = expected_mem / mem.total  # 전체 RAM 대비 예상 비율
+            used_ratio = expected_mem / mem.total  # expected ratio of total RAM
 
             if used_ratio >= 0.2:
                 messagebox.showwarning(
@@ -248,11 +248,11 @@ class ResultTab(BayesianOptimizer):
 
             candidate_x = torch.cartesian_prod(*candidate_points).to(device)
 
-            # 이미 평가된 점들 제거
+            # remove already evaluated points
             mask = ~torch.any(torch.cdist(candidate_x, train_x) < 1e-5, dim=1)
             filtered_candidate_x = candidate_x[mask]
 
-            # 데이터 수 체크
+            # check data count
             if len(train_x) < 6:
                 messagebox.showwarning("Insufficient Data", "At least 6 data points are required to use BOOST.")
                 return
@@ -261,10 +261,10 @@ class ResultTab(BayesianOptimizer):
                 messagebox.showinfo("Optimization Complete", "All possible combinations have already been evaluated!")
                 return
 
-            # 진행 상황 출력
+            # show progress
             self.result_text.insert(tk.END, "\nRunning Bayesian Optimization...\n")
             self.result_text.insert(tk.END, "Searching for the best kernel–acquisition pair...\n")
-            self.result_text.update()  # UI 즉시 업데이트
+            self.result_text.update()  # Update UI immediately
 
             boost = BOOST(device=device)
             kernel_type, acquisition_type = boost.get_kernel_acq(train_x=train_x, train_y=train_y)
@@ -282,19 +282,19 @@ class ResultTab(BayesianOptimizer):
 
             prediction_std = np.sqrt(prediction_var)
 
-            # 최대화 원복
+            # revert maximization
             if is_maximization:
                 prediction_mean = -prediction_mean
 
-            # 67% 신뢰구간
+            # 67% confidence interval
             lower_bound = prediction_mean - prediction_std
             upper_bound = prediction_mean + prediction_std
 
-            # next_point 변환
+            # convert next_point
             next_point_cpu = next_point.cpu().numpy().flatten()
             next_point_list = [round(float(val), 4) for val in next_point_cpu]
 
-            # 결과 표시
+            # display results
             self.result_text.insert(tk.END, "\n=== Prediction ===\n")
             point_str = ", ".join([f"{param_info[i]['name']}={next_point_list[i]}"
                                    for i in range(len(next_point_list))])
@@ -310,7 +310,7 @@ class ResultTab(BayesianOptimizer):
             )
             self.suggestion_label.config(text=suggestion_text)
 
-            # 단일 포인트도 리스트로 저장
+            # store single point as a list
             self.last_suggested_points = [next_point_list]
             self.last_param_info = param_info
             self.add_points_button.config(state="normal")
@@ -319,10 +319,10 @@ class ResultTab(BayesianOptimizer):
             messagebox.showerror("Execution Error", str(e))
 
     def add_suggested_points_to_data(self):
-        """추천된 포인트들을 데이터 탭에 추가"""
+        """Add recommended points to the data tab"""
         if self.last_suggested_points and self.last_param_info:
             self.main_app.data_tab.add_suggested_points(self.last_suggested_points, self.last_param_info)
-            self.add_points_button.config(state="disabled")  # 추가 후 비활성화
+            self.add_points_button.config(state="disabled")  # Disable after adding
         else:
             messagebox.showwarning("Warning", "There are no recommended points to add.")
 
@@ -333,7 +333,7 @@ class ResultTab(BayesianOptimizer):
         import torch
         import random
 
-        # 기존 평가된 점들 확인
+        # Check existing evaluated points
         evaluated_set = set()
         df = self.main_app.data_tab.extract_data_only()
         if not df.empty:
@@ -343,7 +343,7 @@ class ResultTab(BayesianOptimizer):
 
         generated_samples = set()
 
-        # 각 차원별 grid point 개수
+        # Number of grid points per dimension
         dim_grid_sizes = []
         for d in range(dim):
             param = param_info[d] if param_info else None
@@ -373,7 +373,7 @@ class ResultTab(BayesianOptimizer):
                 random.shuffle(dim_points)
                 lhs_points.append(dim_points)
 
-            # 조합 수가 적어서 LHS가 무의미한 경우 → 가능한 조합에서 랜덤 샘플
+            # If combinations are too few for LHS -> Random sample from possible combinations
             if n_samples >= max_possible_samples ** d:
                 grid_lists = []
                 for param in param_info:
