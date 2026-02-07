@@ -46,16 +46,16 @@ File Types
 - Summarizes regret (mean and std) for each iteration
 
 Directory Structure
-- 1. Synthetic Benchmark Functions
+1. Synthetic Benchmark Functions
    - 1.1 BOOST
    - 1.2 16_Deterministic
-- 2. Machine Learning Hyperparameter Optimization
+2. Machine Learning Hyperparameter Optimization
    - 2.1 BOOST
    - 2.2 16_Deterministic
-- 3. Chemical Engineering Experiments
+3. Chemical Engineering Experiments
    - 3.1 BOOST
    - 3.2 16_Deterministic
-- A. Additional Results → Data referenced in technical appendix (excluding ‘Default,’ which is included in the BOOST data).
+A. Additional Results → Data referenced in technical appendix (excluding ‘Default,’ which is included in the BOOST data).
 
 Notes
 - Throughout the code and results, the Lower Confidence Bound (LCB) acquisition function is referred to as UCB for convenience, following common usage in BO libraries.
