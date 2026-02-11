@@ -1,6 +1,6 @@
-# BOOST: Bayesian Optimization with Optimal Kernel and Acquisition Function Selection Technique
-
-Implementation of **BOOST**, a novel Bayesian Optimization framework designed to automatically select the optimal kernel and acquisition function pair during the optimization process.
+# BOOST: A Data-Driven Framework for the Automated Joint Selection of Kernel and Acquisition Functions in Bayesian Optimization
+Implementation of **BOOST** ( Bayesian Optimization with Optimal Kernel and Acquisition Function Selection Technique
+), a novel Bayesian Optimization framework designed to automatically select the optimal kernel and acquisition function pair during the optimization process.
 
 ## Code Structure
 
